@@ -1,11 +1,17 @@
-from flask import Flask, request , jsonify
+from fastapi import FastAPI, File
+from artifacts.preprocessing import preprocessing
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/classify_image",methods=['GET','POST'])
-def classify_image():
-    return "hi"
+@app.get("/")
+def index():
+    return {"Hello":"hello"}
 
-
-if __name__ == '__main__' :
-    app.run(port=3000)
+@app.post("/get-image")
+async def UploadImage(file: bytes = File(...)):
+    with open('./artifacts/image.jpg','wb') as image:
+        image.write(file)
+        image.close()
+    preprocessing('./artifacts/image.jpg')
+    
+    return 'got it'
